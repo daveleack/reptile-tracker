@@ -1,4 +1,4 @@
-﻿package com.example.reptiletracker
+package com.example.reptiletracker
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

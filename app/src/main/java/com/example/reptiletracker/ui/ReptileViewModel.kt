@@ -1,4 +1,4 @@
-﻿package com.example.reptiletracker.ui
+package com.example.reptiletracker.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-﻿package com.example.reptiletracker.util
+package com.example.reptiletracker.util
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

@@ -1,4 +1,4 @@
-﻿package com.example.reptiletracker.data
+package com.example.reptiletracker.data
 
 import androidx.room.*
 
