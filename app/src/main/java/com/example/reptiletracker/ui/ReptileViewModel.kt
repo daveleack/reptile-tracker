@@ -24,6 +24,18 @@ class ReptileViewModel @Inject constructor(
         initialValue = emptyMap()
     )
 
+    fun addPet(name: String, species: String) {
+        viewModelScope.launch {
+            repository.addPet(Pet(name = name, species = species))
+        }
+    }
+
+    fun renamePet(pet: Pet, newName: String) {
+        viewModelScope.launch {
+            repository.updatePet(pet.copy(name = newName))
+        }
+    }
+
     fun addFeedingLog(
         petId: Long,
         foodType: String,

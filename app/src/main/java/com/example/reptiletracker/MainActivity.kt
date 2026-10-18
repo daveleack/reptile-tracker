@@ -10,9 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.example.reptiletracker.data.Pet
-import com.example.reptiletracker.ui.AddFeedingLogDialog
-import com.example.reptiletracker.ui.MultiPetTimelineScreen
-import com.example.reptiletracker.ui.ReptileViewModel
+import com.example.reptiletracker.ui.*
 import com.example.reptiletracker.util.CalendarUtils
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,20 +30,38 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val petsWithLogs by viewModel.petsWithLogs.collectAsState()
                     var selectedPetForFeeding by remember { mutableStateOf<Pet?>(null) }
+                    var selectedPetForSchedule by remember { mutableStateOf<Pet?>(null) }
+                    var petToRename by remember { mutableStateOf<Pet?>(null) }
+                    var showAddPetDialog by remember { mutableStateOf(false) }
 
                     MultiPetTimelineScreen(
                         petsWithLogs = petsWithLogs,
+                        onAddPetClick = { showAddPetDialog = true },
+                        onRenamePetClick = { pet -> petToRename = pet },
                         onAddLogClick = { pet -> selectedPetForFeeding = pet },
-                        onScheduleClick = { pet ->
-                            val nextDueDate = System.currentTimeMillis() + (7 * 24 * 60 * 60 * 1000L)
-                            CalendarUtils.addScheduleToGoogleCalendar(
-                                context = this@MainActivity,
-                                pet = pet,
-                                taskName = "Feeding Schedule",
-                                dueDateMillis = nextDueDate
-                            )
-                        }
+                        onScheduleClick = { pet -> selectedPetForSchedule = pet }
                     )
+
+                    if (showAddPetDialog) {
+                        AddPetDialog(
+                            onDismiss = { showAddPetDialog = false },
+                            onSubmit = { name, species ->
+                                viewModel.addPet(name, species)
+                                showAddPetDialog = false
+                            }
+                        )
+                    }
+
+                    petToRename?.let { pet ->
+                        RenamePetDialog(
+                            pet = pet,
+                            onDismiss = { petToRename = null },
+                            onSubmit = { newName ->
+                                viewModel.renamePet(pet, newName)
+                                petToRename = null
+                            }
+                        )
+                    }
 
                     selectedPetForFeeding?.let { pet ->
                         AddFeedingLogDialog(
@@ -60,6 +76,25 @@ class MainActivity : ComponentActivity() {
                                     notes = notes
                                 )
                                 selectedPetForFeeding = null
+                            }
+                        )
+                    }
+
+                    selectedPetForSchedule?.let { pet ->
+                        ScheduleTaskDialog(
+                            petName = pet.name,
+                            onDismiss = { selectedPetForSchedule = null },
+                            onSubmit = { taskName, daysFromNow, syncWithGoogle ->
+                                val dueDate = System.currentTimeMillis() + (daysFromNow * 24 * 60 * 60 * 1000L)
+                                if (syncWithGoogle) {
+                                    CalendarUtils.addScheduleToGoogleCalendar(
+                                        context = this@MainActivity,
+                                        pet = pet,
+                                        taskName = taskName,
+                                        dueDateMillis = dueDate
+                                    )
+                                }
+                                selectedPetForSchedule = null
                             }
                         )
                     }

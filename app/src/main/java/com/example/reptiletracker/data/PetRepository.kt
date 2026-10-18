@@ -14,6 +14,7 @@ class PetRepository @Inject constructor(
     fun getLogsForPet(petId: Long): Flow<List<LogEntry>> = petDao.getLogsForPet(petId)
 
     suspend fun addPet(pet: Pet) = petDao.insertPet(pet)
+    suspend fun updatePet(pet: Pet) = petDao.updatePet(pet)
     suspend fun addLog(logEntry: LogEntry) = petDao.insertLogEntry(logEntry)
     suspend fun deletePet(pet: Pet) = petDao.deletePet(pet)
 }

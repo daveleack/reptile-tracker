@@ -21,6 +21,8 @@ import java.util.*
 @Composable
 fun MultiPetTimelineScreen(
     petsWithLogs: Map<Pet, List<LogEntry>>,
+    onAddPetClick: () -> Unit,
+    onRenamePetClick: (Pet) -> Unit,
     onAddLogClick: (Pet) -> Unit,
     onScheduleClick: (Pet) -> Unit
 ) {
@@ -35,7 +37,19 @@ fun MultiPetTimelineScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Reptile Health Matrix") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Reptile Health Matrix") },
+                actions = {
+                    Button(
+                        onClick = onAddPetClick,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("+ Add Pet")
+                    }
+                }
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -80,7 +94,9 @@ fun MultiPetTimelineScreen(
                         logs = petsWithLogs[pet] ?: emptyList(),
                         days = days,
                         horizontalScrollState = horizontalScrollState,
-                        onAddLog = { onAddLogClick(pet) }
+                        onRenamePet = { onRenamePetClick(pet) },
+                        onAddLog = { onAddLogClick(pet) },
+                        onSchedule = { onScheduleClick(pet) }
                     )
                     Divider()
                 }
@@ -95,26 +111,55 @@ fun PetTimelineRow(
     logs: List<LogEntry>,
     days: List<Date>,
     horizontalScrollState: ScrollState,
-    onAddLog: () -> Unit
+    onRenamePet: () -> Unit,
+    onAddLog: () -> Unit,
+    onSchedule: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(88.dp),
+        modifier = Modifier.fillMaxWidth().height(96.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
                 .width(130.dp)
                 .fillMaxHeight()
-                .padding(8.dp),
+                .padding(6.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(pet.name, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = pet.name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    modifier = Modifier.clickable { onRenamePet() }
+                )
+                Text(
+                    text = "âœï¸",
+                    fontSize = 10.sp,
+                    modifier = Modifier.clickable { onRenamePet() }
+                )
+            }
             Text(pet.species, fontSize = 11.sp, color = Color.Gray)
-            AssistChip(
-                onClick = onAddLog,
-                label = { Text("+ Log", fontSize = 10.sp) },
-                modifier = Modifier.height(24.dp)
-            )
+            
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                AssistChip(
+                    onClick = onAddLog,
+                    label = { Text("+ Log", fontSize = 9.sp) },
+                    modifier = Modifier.height(22.dp)
+                )
+                AssistChip(
+                    onClick = onSchedule,
+                    label = { Text("ðŸ“…", fontSize = 9.sp) },
+                    modifier = Modifier.height(22.dp)
+                )
+            }
         }
 
         Divider(modifier = Modifier.fillMaxHeight().width(1.dp))
@@ -161,9 +206,9 @@ fun LogChip(log: LogEntry) {
                 FeedingReaction.TAKEN_LATE -> Color(0xFFFFB300)
                 null -> Color.Gray
             }
-            color to "ðŸ½ï¸ "
+            color to "ðŸ½ï¸ ${log.foodType ?: ""}"
         }
-        LogType.WEIGHING -> Color(0xFF2196F3) to "âš–ï¸ g"
+        LogType.WEIGHING -> Color(0xFF2196F3) to "âš–ï¸ ${log.weightGrams?.toInt()}g"
         LogType.SHEDDING -> Color(0xFF9C27B0) to "ðŸ Shed"
         LogType.CLEANING -> Color(0xFF00BCD4) to "ðŸ§¹ Clean"
         LogType.NOTE -> Color(0xFF607D8B) to "ðŸ“ Note"

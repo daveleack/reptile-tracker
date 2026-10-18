@@ -14,8 +14,8 @@ object CalendarUtils {
     ) {
         val intent = Intent(Intent.ACTION_INSERT).apply {
             data = CalendarContract.Events.CONTENT_URI
-            putExtra(CalendarContract.Events.TITLE, ": ")
-            putExtra(CalendarContract.Events.DESCRIPTION, "Reptile maintenance task for ")
+            putExtra(CalendarContract.Events.TITLE, "${pet.name}: $taskName")
+            putExtra(CalendarContract.Events.DESCRIPTION, "Reptile care task for ${pet.species}")
             putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, dueDateMillis)
             putExtra(CalendarContract.EXTRA_EVENT_END_TIME, dueDateMillis + (30 * 60 * 1000))
         }
