@@ -20,6 +20,10 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      # Generate the native gradle wrapper JAR directly on the runner
+      - name: Generate Gradle Wrapper
+        run: gradle wrapper --gradle-version 8.4
+
       - name: Grant Execute Permission for Gradle
         run: chmod +x gradlew
 
